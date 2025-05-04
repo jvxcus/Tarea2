@@ -32,4 +32,26 @@ public class ActividadService {
         Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
         return cultivo != null ? cultivo.getActividades() : new ArrayList<>(); // Retorna lista vacía si no existe
     }
+    //Metodo para eliminar una actividad segun tipo y fecha
+    public boolean eliminarActividad(String nombreCultivo, String tipo, LocalDate fecha) {
+        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
+        if (cultivo != null) {
+            return cultivo.getActividades().removeIf(
+                a -> a.getTipo().equalsIgnoreCase(tipo) && a.getFecha().equals(fecha)
+            );
+    }
+    return false;
+    //Metodo para marcar como completada una actividad segun tipo y fecha
+    public boolean marcarComoCompletada(String nombreCultivo, String tipo, LocalDate fecha) {
+        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
+        if (cultivo != null) {
+            for (Actividad a : cultivo.getActividades()) {
+                if (a.getTipo().equalsIgnoreCase(tipo) && a.getFecha().equals(fecha)) {
+                    a.setCompletada(true);
+                    return true;
+                }
+            }
+        }
+        return false;
+}
 }
