@@ -25,5 +25,28 @@ public class CultivoService {
             cultivos.add(cultivo); // Añade a la lista
         }
     }
+    //Funcion para eliminar un cultivo
+    public boolean eliminarCultivo(String nombre) {
+        Cultivo cultivo = buscarPorNombre(nombre);
+        if (cultivo != null && cultivo.getActividades().isEmpty()) {
+            cultivos.remove(cultivo); // Elimina de la lista
+            return true;
+        }
+        return false; // No se puede eliminar si tiene actividades
+    }
+    // Actualiza la info de un cultivo
+    public boolean actualizarCultivo(String nombre, String nuevaVariedad, double nuevaSuperficie,
+                                    String nuevoCodigoParcela, LocalDate nuevaFechaSiembra, String nuevoEstado) {
+        Cultivo cultivo = buscarPorNombre(nombre);
+        if (cultivo != null) {
+            cultivo.setVariedad(nuevaVariedad);
+            cultivo.setSuperficie(nuevaSuperficie);
+            cultivo.setCodigoParcela(nuevoCodigoParcela);
+            cultivo.setFechaSiembra(nuevaFechaSiembra);
+            cultivo.setEstado(nuevoEstado);
+            return true; // Actualización exitosa
+    }
+    return false; // No se encontró el cultivo
+    }
 }
 
