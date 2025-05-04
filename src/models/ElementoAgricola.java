@@ -1,4 +1,23 @@
+package models;
+
+import java.time.LocalDate;
+
 public abstract class ElementoAgricola {
-    protected String nombre; //plantilla que no se puede instanciar directamente, pero que sirve para que otras clases la hereden.
+    protected String nombre;
     protected LocalDate fechaSiembra;
+
+    public ElementoAgricola(String nombre, LocalDate fechaSiembra) {
+        this.nombre = nombre;
+        this.fechaSiembra = fechaSiembra;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public LocalDate getFechaSiembra() {
+        return fechaSiembra;
+    }
+
+    public abstract void mostrarEstado();
 }
