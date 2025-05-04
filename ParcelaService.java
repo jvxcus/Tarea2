@@ -38,4 +38,23 @@ public class ParcelaService {
     public List<Parcela> obtenerTodas() {
         return new ArrayList<>(parcelas); // Copia defensiva
     }
+    //Metodo para eliminar una parcela
+    public boolean eliminarParcela(String codigo) {
+        Parcela parcela = buscarPorCodigo(codigo);
+        if (parcela != null && parcela.getCultivos().isEmpty()) {
+            parcelas.remove(parcela);
+            return true; // Eliminación exitosa
+        }
+        return false; // No se puede eliminar si tiene cultivos
+    }
+    //Metodo para editar la info de una parcela (tamano, ubicacion)
+    public boolean editarParcela(String codigo, double nuevoTamaño, String nuevaUbicacion) {
+        Parcela parcela = buscarPorCodigo(codigo);
+        if (parcela != null) {
+            parcela.setTamaño(nuevoTamaño);
+            parcela.setUbicacion(nuevaUbicacion);
+            return true; // Edición exitosa
+        }
+        return false; // No se encontró la parcela
+    }
 }
