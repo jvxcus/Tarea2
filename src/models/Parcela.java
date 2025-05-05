@@ -37,6 +37,6 @@ public class Parcela {
 
     @Override
     public String toString() {
-        return "Parcela: " + codigo + ", " + tamaño + " ha, ubicación: " + ubicacion;
+        return "Parcela: " + codigo + "\nTamaño: " + tamaño + "\nUbicación: " + ubicacion + "\n\n";
     }
 }
