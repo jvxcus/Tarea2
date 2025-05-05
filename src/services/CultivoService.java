@@ -8,30 +8,30 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Map;
+import java.util.HashMap;
 
 public class CultivoService {
 
     private List<Cultivo> cultivos = new ArrayList<>();
-    private String rutaArchivoCSV;
     private CSVService csvService = new CSVService();
 
-    public CultivoService(String rutaArchivoCSV) {
-        this.rutaArchivoCSV = rutaArchivoCSV;
-    }
 
-    public void cargarCultivos() {
-        cultivos = csvService.leerCultivos(rutaArchivoCSV);
-        System.out.println("Cultivos cargados correctamente.");
+    public List<Cultivo> cargarCultivos() {
+        cultivos = csvService.leerCultivos();
+        return cultivos;
     }
 
     public void guardarCultivos() {
-        csvService.guardarCultivos(rutaArchivoCSV, cultivos);
-        System.out.println("Cultivos guardados en archivo.");
+        csvService.guardarCultivos(cultivos);
     }
 
     public void listarCultivos() {
         if (cultivos.isEmpty()) {
-            System.out.println("No hay cultivos cargados.");
+            this.cargarCultivos();
+            for (Cultivo c : cultivos) {
+                System.out.println(c);
+            }
         } else {
             for (Cultivo c : cultivos) {
                 System.out.println(c);
@@ -39,7 +39,7 @@ public class CultivoService {
         }
     }
 
-    public void crearCultivoInteractivo(Scanner scanner) {
+    public void crearCultivo(Scanner scanner) {
         System.out.print("Nombre del cultivo: ");
         String nombreCultivo = scanner.nextLine();
 
@@ -63,7 +63,9 @@ public class CultivoService {
                 fechaSiembra, estado);
 
         cultivos.add(cultivo);
-        System.out.println("✅ Cultivo creado exitosamente.");
+        this.guardarCultivos();
+        System.out.println("Cultivo creado");
+
     }
 
     public void eliminarCultivo(Scanner scanner) {
@@ -73,6 +75,7 @@ public class CultivoService {
         Cultivo cultivo = buscarPorNombre(nombre);
         if (cultivo != null) {
             cultivos.remove(cultivo);
+            this.guardarCultivos();
             System.out.println("Cultivo eliminado.");
         } else {
             System.out.println("No se encontró un cultivo con ese nombre.");
@@ -107,10 +110,13 @@ public class CultivoService {
         System.out.print("Nuevo estado (ACTIVO, EN_RIESGO, COSECHADO): ");
         cultivo.setEstado(EstadoCultivo.valueOf(scanner.nextLine().trim().toUpperCase()));
 
+        this.guardarCultivos();
         System.out.println("Cultivo actualizado.");
     }
 
     public Cultivo buscarPorNombre(String nombre) {
+        this.cargarCultivos();
+
         for (Cultivo c : cultivos) {
             if (c.getNombre().equalsIgnoreCase(nombre)) {
                 return c;
@@ -124,6 +130,33 @@ public class CultivoService {
             cultivos.add(cultivo);
         }
     }
+
+    public void reporteCultivos(Scanner scanner) {
+        this.cargarCultivos();  // Asegura datos actualizados
+
+        Map<EstadoCultivo, List<Cultivo>> agrupados = new HashMap<>();
+
+        for (Cultivo cultivo : cultivos) {
+            EstadoCultivo estado = cultivo.getEstado();
+            agrupados.putIfAbsent(estado, new ArrayList<>());
+            agrupados.get(estado).add(cultivo);
+        }
+
+        for (EstadoCultivo estado : agrupados.keySet()) {
+            List<Cultivo> lista = agrupados.get(estado);
+            double superficieTotal = 0;
+
+            for (Cultivo c : lista) {
+                superficieTotal += c.getSuperficie();
+            }
+
+            System.out.println("Estado: " + estado);
+            System.out.println("Cantidad de cultivos: " + lista.size());
+            System.out.printf("Superficie total: %.2f ha%n", superficieTotal);
+            System.out.println("----------------------------");
+        }
+    }
+
 
     public List<Cultivo> getCultivos() {
         return cultivos;
