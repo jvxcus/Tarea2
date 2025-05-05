@@ -20,6 +20,8 @@ public class Cultivo extends ElementoAgricola {
         this.actividades = new ArrayList<>();
     }
 
+    public String getNombre() { return nombre; }
+
     public String getVariedad() {
         return variedad;
     }
