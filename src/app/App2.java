@@ -1,5 +1,6 @@
 package app;
 
+
 import services.CultivoService;
 import services.ParcelaService;
 import services.ActividadService;
@@ -14,13 +15,11 @@ public class App2 {
 
         String archivoCSV = args[0];
 
-        CultivoService cultivoService = new CultivoService(archivoCSV);
-        cultivoService.cargarCultivos();
-
-        ParcelaService parcelaService = new ParcelaService(); // sin persistencia
+        CultivoService cultivoService = new CultivoService();
+        ParcelaService parcelaService = new ParcelaService();
         ActividadService actividadService = new ActividadService();
 
-        Menu menu = new Menu(cultivoService, parcelaService, actividadService);
+        Menu menu = new Menu(); // ← sin argumentos
         menu.mostrarMenu();
 
         cultivoService.guardarCultivos(); // guarda solo los cultivos

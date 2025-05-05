@@ -9,85 +9,66 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ActividadService {
-    private CultivoService cultivoService;
 
-    public ActividadService() {}
+    private List<Actividad> actividades = new ArrayList<>();
+    private CSVService csvService = new CSVService();
 
-    public ActividadService(CultivoService cultivoService) {
-        this.cultivoService = cultivoService;
+    public List<Actividad> cargarActividades() {
+        actividades = csvService.leerActividades();
+        return actividades;
     }
 
-    // Agrega una nueva actividad desde consola
-    public void registrarActividad(Scanner scanner, CultivoService cultivoService) {
-        System.out.print("Nombre del cultivo: ");
-        String nombre = scanner.nextLine();
-
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombre);
-        if (cultivo == null) {
-            System.out.println("Cultivo no encontrado.");
-            return;
-        }
-
-        System.out.print("Tipo de actividad (RIEGO, FERTILIZACION, etc.): ");
-        String tipo = scanner.nextLine();
-
-        System.out.print("Fecha de la actividad (YYYY-MM-DD): ");
-        String fechaTexto = scanner.nextLine();
-        LocalDate fecha = LocalDate.parse(fechaTexto);
-
-        cultivo.agregarActividad(new Actividad(tipo, fecha));
-        System.out.println("Actividad registrada.");
+    public void guardarActividades() {
+        csvService.guardarActividades(actividades);
     }
 
-    // Lista todas las actividades de un cultivo
     public void listarActividades(Scanner scanner, CultivoService cultivoService) {
-        System.out.print("Nombre del cultivo: ");
-        String nombre = scanner.nextLine();
-
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombre);
-        if (cultivo == null) {
-            System.out.println("Cultivo no encontrado.");
-            return;
+        if (actividades.isEmpty()) {
+            this.cargarActividades();
         }
 
-        List<Actividad> actividades = cultivo.getActividades();
-        if (actividades.isEmpty()) {
-            System.out.println("No hay actividades registradas.");
-        } else {
-            for (Actividad a : actividades) {
-                System.out.println(a);
-            }
+        for (Actividad a : actividades) {
+            System.out.println(a);
         }
     }
 
-    // Elimina una actividad específica por tipo y fecha
-    public void eliminarActividad(Scanner scanner, CultivoService cultivoService) {
-        System.out.print("Nombre del cultivo: ");
-        String nombre = scanner.nextLine();
-
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombre);
-        if (cultivo == null) {
-            System.out.println("Cultivo no encontrado.");
-            return;
-        }
-
-        System.out.print("Tipo de actividad a eliminar: ");
+    public void registrarActividad(Scanner scanner, CultivoService cultivoService) {
+        System.out.print("Nombre de la Actividad a registrar: ");
         String tipo = scanner.nextLine();
-        System.out.print("Fecha de la actividad a eliminar (YYYY-MM-DD): ");
+
+        System.out.print("Fecha de la Actividad (YYYY-MM-DD): ");
         LocalDate fecha = LocalDate.parse(scanner.nextLine());
 
-        boolean eliminada = cultivo.getActividades().removeIf(a ->
-                a.getTipo().equalsIgnoreCase(tipo) && a.getFecha().equals(fecha)
-        );
+        Actividad actividad = new Actividad(tipo, fecha);
+        actividades.add(actividad);
+        this.guardarActividades();
+        System.out.println("Actividad registrada");
+    }
 
-        if (eliminada) {
+    public void eliminarActividad(Scanner scanner, CultivoService cultivoService) {
+        System.out.print("Nombre de la Actividad a eliminar: ");
+        String nombre = scanner.nextLine();
+
+        Actividad actividad = buscarPorNombre(nombre);
+        if (actividad != null) {
+            actividades.remove(actividad);
+            this.guardarActividades();
             System.out.println("Actividad eliminada.");
         } else {
-            System.out.println("No se encontró la actividad.");
+            System.out.println("No se encontró la Actividad.");
         }
     }
 
-    // Marca una actividad como completada
+    // Método auxiliar para buscar una actividad por nombre
+    private Actividad buscarPorNombre(String nombre) {
+        for (Actividad a : actividades) {
+            if (a.getTipo().equalsIgnoreCase(nombre)) {
+                return a;
+            }
+        }
+        return null;
+    }
+
     public void marcarActividadCompletada(Scanner scanner, CultivoService cultivoService) {
         System.out.print("Nombre del cultivo: ");
         String nombre = scanner.nextLine();
@@ -100,6 +81,7 @@ public class ActividadService {
 
         System.out.print("Tipo de actividad: ");
         String tipo = scanner.nextLine();
+
         System.out.print("Fecha de la actividad (YYYY-MM-DD): ");
         LocalDate fecha = LocalDate.parse(scanner.nextLine());
 
@@ -112,48 +94,5 @@ public class ActividadService {
         }
 
         System.out.println("No se encontró la actividad.");
-    }
-
-    // Métodos alternativos programáticos
-
-    public boolean agregarActividad(String nombreCultivo, String tipo, LocalDate fecha) {
-        if (cultivoService == null) return false;
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
-        if (cultivo != null) {
-            cultivo.getActividades().add(new Actividad(tipo, fecha));
-            return true;
-        }
-        return false;
-    }
-
-    public List<Actividad> obtenerActividades(String nombreCultivo) {
-        if (cultivoService == null) return new ArrayList<>();
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
-        return cultivo != null ? cultivo.getActividades() : new ArrayList<>();
-    }
-
-    public boolean eliminarActividad(String nombreCultivo, String tipo, LocalDate fecha) {
-        if (cultivoService == null) return false;
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
-        if (cultivo != null) {
-            return cultivo.getActividades().removeIf(
-                    a -> a.getTipo().equalsIgnoreCase(tipo) && a.getFecha().equals(fecha)
-            );
-        }
-        return false;
-    }
-
-    public boolean marcarComoCompletada(String nombreCultivo, String tipo, LocalDate fecha) {
-        if (cultivoService == null) return false;
-        Cultivo cultivo = cultivoService.buscarPorNombre(nombreCultivo);
-        if (cultivo != null) {
-            for (Actividad a : cultivo.getActividades()) {
-                if (a.getTipo().equalsIgnoreCase(tipo) && a.getFecha().equals(fecha)) {
-                    a.setCompletada(true);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

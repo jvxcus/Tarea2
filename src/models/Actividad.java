@@ -31,6 +31,6 @@ public class Actividad {
 
     @Override
     public String toString() {
-        return tipo + " (" + fecha + ")" + (completada ? " - Completada" : "");
+        return "Actividad: "+ tipo + " (" + fecha + ")" + (completada ? " - Completada" : "");
     }
 }
